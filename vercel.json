@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/github", "destination": "/api/github" },
+    { "source": "/admin", "destination": "/admin/index.html" }
+  ]
+}

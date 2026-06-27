@@ -137,12 +137,11 @@ input:focus, textarea:focus { border-color: var(--green-dark); }
 </head>
 <body>
 <header>
-	<h1>⚙️ 后台管理</h1>
-	<a href="/" target="_blank">← 返回网站</a>
+	<h1>&#9881;&#65039; 后台管理</h1>
+	<a href="/" target="_blank">&larr; 返回网站</a>
 </header>
 <div class="container" id="app">
 
-<!-- Login -->
 <div id="loginView" class="login-box">
 	<h2>登录</h2>
 	<p>输入你的 GitHub Personal Access Token 来管理博客内容。<br>Token 只会保存在你的浏览器本地，不会上传到其他地方。</p>
@@ -166,19 +165,17 @@ input:focus, textarea:focus { border-color: var(--green-dark); }
 	</div>
 </div>
 
-<!-- Post list -->
 <div id="listView" class="hidden">
 	<div class="toolbar">
-		<button class="btn btn-primary" onclick="newPost()">✏️ 写新文章</button>
+		<button class="btn btn-primary" onclick="newPost()">&#9998;&#65039; 写新文章</button>
 		<button class="btn btn-secondary" onclick="logout()">注销</button>
 		<span id="listStatus" style="font-size:0.85em;color:var(--text-muted);align-self:center;"></span>
 	</div>
 	<ul class="post-list" id="postList"></ul>
 </div>
 
-<!-- Editor -->
 <div id="editorView" class="hidden">
-	<div class="breadcrumb" onclick="backToList()">← 返回文章列表</div>
+	<div class="breadcrumb" onclick="backToList()">&larr; 返回文章列表</div>
 	<div class="editor-panel">
 		<div class="editor-field">
 			<label>标题</label>
@@ -197,11 +194,11 @@ input:focus, textarea:focus { border-color: var(--green-dark); }
 				<span>正文 (Markdown)</span>
 				<span id="saveStatus"></span>
 			</label>
-			<textarea id="editBody" placeholder="在这里写内容…"></textarea>
+			<textarea id="editBody" placeholder="在这里写内容..."></textarea>
 		</div>
 		<div class="editor-actions">
-			<button class="btn btn-primary" onclick="savePost()">💾 保存</button>
-			<button class="btn btn-danger" id="deleteBtn" onclick="deletePost()">🗑 删除</button>
+			<button class="btn btn-primary" onclick="savePost()">&#128190; 保存</button>
+			<button class="btn btn-danger" id="deleteBtn" onclick="deletePost()">&#128465;&#65039; 删除</button>
 		</div>
 	</div>
 </div>
@@ -215,47 +212,44 @@ let state = {
 	currentFile: null,
 };
 
-// ==== GitHub API ====
-const GH = 'https://api.github.com';
-
 async function ghFetch(url, opts = {}) {
 	if (state.token === 'demo') {
 		return demoResponse(url, opts);
 	}
-	const res = await fetch(GH + url, {
-		...opts,
+	const method = opts.method || 'GET';
+	const res = await fetch('/api/github?path=' + encodeURIComponent(url), {
+		method: method,
 		headers: {
 			'Authorization': 'Bearer ' + state.token,
-			'Accept': 'application/vnd.github.v3+json',
 			'Content-Type': 'application/json',
-			...opts.headers,
 		},
+		body: opts.body || null,
 	});
+	const data = await res.json();
 	if (!res.ok) {
-		const err = await res.json().catch(() => ({ message: res.statusText }));
-		throw new Error(err.message || '请求失败');
+		throw new Error(data.message || '请求失败');
 	}
-	return res;
+	return data;
 }
 
 // ==== Demo mode ====
 function demoResponse(url, opts) {
 	if (url.includes('/git/blobs')) {
-		return { json: async () => ({ content: btoa(demoPosts[state.currentFile] || '# 文章内容') }) };
+		return { content: btoa(demoPosts[state.currentFile] || '# 文章内容') };
 	}
 	if (url.includes('/contents/')) {
 		if (opts.method === 'PUT') {
-			return { json: async () => ({ content: { sha: 'demo' } }) };
+			return { content: { sha: 'demo' } };
 		}
 		if (opts.method === 'DELETE') {
-			return { json: async () => ({}) };
+			return {};
 		}
-		return { json: async () => demoPostsList() };
+		return demoPostsList();
 	}
 	if (url.includes('/git/trees')) {
-		return { json: async () => ({ tree: demoPostsList().filter(f => f.type === 'file').map(f => ({ path: f.path, type: 'blob' })) }) };
+		return { tree: demoPostsList().filter(f => f.type === 'file').map(f => ({ path: f.path, type: 'blob' })) };
 	}
-	return { json: async () => ({}) };
+	return {};
 }
 
 const demoPosts = {
@@ -263,18 +257,16 @@ const demoPosts = {
 };
 
 function demoPostsList() {
-	// Read demo content from current editor state
 	const content = state.currentFile === 'new' ? null : (demoPosts[state.currentFile] || null);
 	return [
-		{ name: 'first-post.md', path: 'src/content/blog/first-post.md', type: 'file', sha: 'demo', demoContent: content || '---\ntitle: 随便写写\ndescription: 第一篇嘛随便写写\npubDate: Jun 27 2026\n---\n\n这是演示内容。你可以正常编辑保存。' },
+		{ name: 'first-post.md', path: 'src/content/blog/first-post.md', type: 'file', sha: 'demo', demoContent: content || '---\ntitle: demo\ndescription: demo\npubDate: Jun 27 2026\n---\n\n这是演示内容。你可以正常编辑保存。' },
 	];
 }
 
 // ==== Data ====
 async function listPosts() {
 	state.files = [];
-	const res = await ghFetch('/repos/' + state.repo + '/git/trees/HEAD?recursive=1');
-	const data = await res.json();
+	const data = await ghFetch('/repos/' + state.repo + '/git/trees/HEAD?recursive=1');
 	state.files = data.tree.filter(f => f.path.startsWith('src/content/blog/') && f.path.endsWith('.md'));
 	return state.files;
 }
@@ -284,8 +276,7 @@ async function getPostContent(path) {
 		const content = document.getElementById('editBody')?.value;
 		if (content) return content;
 	}
-	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
-	const data = await res.json();
+	const data = await ghFetch('/repos/' + state.repo + '/contents/' + path);
 	return atob(data.content.replace(/\n/g, ''));
 }
 
@@ -301,18 +292,17 @@ function parseFrontmatter(text) {
 }
 
 function buildFrontmatter(title, desc, date, body) {
-	return `---\ntitle: ${title}\ndescription: ${desc}\npubDate: ${date}\n---\n\n${body.trim()}\n`;
+	return '---\ntitle: ' + title + '\ndescription: ' + desc + '\npubDate: ' + date + '\n---\n\n' + body.trim() + '\n';
 }
 
 async function saveFile(path, content, message) {
-	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
 	let sha = null;
 	try {
-		const data = await res.json();
+		const data = await ghFetch('/repos/' + state.repo + '/contents/' + path);
 		sha = data.sha;
-	} catch(e) { /* new file */ }
+	} catch(e) {}
 
-	const putRes = await ghFetch('/repos/' + state.repo + '/contents/' + path, {
+	const result = await ghFetch('/repos/' + state.repo + '/contents/' + path, {
 		method: 'PUT',
 		body: JSON.stringify({
 			message: message || 'Update from CMS',
@@ -320,12 +310,11 @@ async function saveFile(path, content, message) {
 			sha: sha || undefined,
 		}),
 	});
-	return putRes.json();
+	return result;
 }
 
 async function deleteFile(path, message) {
-	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
-	const data = await res.json();
+	const data = await ghFetch('/repos/' + state.repo + '/contents/' + path);
 	await ghFetch('/repos/' + state.repo + '/contents/' + path, {
 		method: 'DELETE',
 		body: JSON.stringify({
@@ -380,11 +369,10 @@ async function loadList() {
 		postInfos.forEach(p => {
 			const li = document.createElement('li');
 			li.className = 'post-item';
-			li.innerHTML = `<div class="info"><h3>${esc(p.title)}</h3><div class="meta">${esc(p.date)} · ${esc(p.path)}</div></div>
-				<div class="post-actions">
-					<button class="btn btn-secondary btn-small" onclick="editPost('${esc(p.path)}')">编辑</button>
-					<button class="btn btn-danger btn-small" onclick="confirmDelete('${esc(p.path)}')">删除</button>
-				</div>`;
+			li.innerHTML = '<div class="info"><h3>' + esc(p.title) + '</h3><div class="meta">' + esc(p.date) + ' &middot; ' + esc(p.path) + '</div></div>' +
+				'<div class="post-actions">' +
+				'<button class="btn btn-secondary btn-small" onclick="editPost(\'' + esc(p.path) + '\')">编辑</button>' +
+				'<button class="btn btn-danger btn-small" onclick="confirmDelete(\'' + esc(p.path) + '\')">删除</button></div>';
 			ul.appendChild(li);
 		});
 		document.getElementById('listStatus').textContent = '';
@@ -438,10 +426,10 @@ async function savePost() {
 			: state.currentFile;
 		await saveFile(filename, content, 'Update: ' + title);
 		state.currentFile = filename;
-		st.textContent = '✅ 已保存！Vercel 将自动部署。';
+		st.textContent = '已保存！Vercel 将自动部署。';
 		st.className = 'success';
 	} catch(e) {
-		st.textContent = '❌ 保存失败: ' + e.message;
+		st.textContent = '保存失败: ' + e.message;
 		st.className = 'error';
 	}
 }
@@ -463,7 +451,6 @@ function esc(s) {
 	return d.innerHTML;
 }
 
-// Auto login
 document.addEventListener('DOMContentLoaded', () => {
 	const t = localStorage.getItem('cms_token');
 	const r = localStorage.getItem('cms_repo');

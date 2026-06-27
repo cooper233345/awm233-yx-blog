@@ -6,6 +6,6 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://awm233-yx.vercel.app',
+	site: 'https://awm233-yx-blog.pages.dev',
 	integrations: [mdx(), sitemap()],
 });

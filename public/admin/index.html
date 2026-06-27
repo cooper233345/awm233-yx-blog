@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>后台管理 — awm233_YX</title>
+<style>
+:root {
+	--green-dark: #2d4a3e;
+	--green-deeper: #1a3528;
+	--green-sage: #c5cdb6;
+	--green-sage-light: #dde3d3;
+	--cream: #f5f0e8;
+	--text-muted: #7a8a7a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	background: var(--cream);
+	background-image: linear-gradient(var(--green-sage-light) 1px, transparent 1px), linear-gradient(90deg, var(--green-sage-light) 1px, transparent 1px);
+	background-size: 48px 48px;
+	color: var(--text-dark);
+	min-height: 100vh;
+}
+header {
+	background: rgba(245,240,232,0.8);
+	backdrop-filter: blur(8px);
+	border-bottom: 1px solid var(--green-sage-light);
+	padding: 0.8em 1.5em;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+header h1 { font-size: 1.1em; color: var(--green-dark); font-weight: 600; }
+header a { color: var(--green-dark); font-size: 0.85em; }
+.container { max-width: 800px; margin: 0 auto; padding: 2em 1.5em; }
+.login-box {
+	background: rgba(255,255,255,0.55);
+	backdrop-filter: blur(4px);
+	padding: 2em;
+	border-radius: 12px;
+	border: 1px solid rgba(197,205,182,0.3);
+	max-width: 420px;
+	margin: 4em auto;
+}
+.login-box h2 { font-size: 1.2em; margin-bottom: 0.5em; }
+.login-box p { font-size: 0.9em; color: var(--text-muted); margin-bottom: 1.2em; line-height: 1.6; }
+label { display: block; font-size: 0.85em; color: var(--green-dark); font-weight: 600; margin-bottom: 0.3em; }
+input, textarea, select {
+	width: 100%;
+	padding: 0.6em 0.8em;
+	border: 1px solid var(--green-sage);
+	border-radius: 6px;
+	font-size: 1em;
+	font-family: inherit;
+	background: rgba(255,255,255,0.7);
+	outline: none;
+	transition: border-color 0.2s;
+}
+input:focus, textarea:focus { border-color: var(--green-dark); }
+.input-group { margin-bottom: 1em; }
+.btn {
+	display: inline-block;
+	padding: 0.5em 1.2em;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.9em;
+	font-weight: 500;
+	cursor: pointer;
+	transition: opacity 0.2s, transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--green-dark); color: white; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { background: rgba(197,205,182,0.4); color: var(--green-dark); }
+.btn-secondary:hover { background: rgba(197,205,182,0.6); }
+.btn-small { padding: 0.35em 0.8em; font-size: 0.82em; }
+.btn-danger { background: #d1453b; color: white; }
+.btn-danger:hover { opacity: 0.9; }
+.hidden { display: none !important; }
+.post-list { list-style: none; }
+.post-item {
+	background: rgba(255,255,255,0.45);
+	backdrop-filter: blur(4px);
+	padding: 1em 1.2em;
+	border-radius: 8px;
+	border: 1px solid rgba(197,205,182,0.3);
+	margin-bottom: 0.6em;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.post-item:hover { background: rgba(255,255,255,0.7); }
+.post-item .info h3 { font-size: 1em; font-weight: 600; color: var(--green-dark); }
+.post-item .info .meta { font-size: 0.82em; color: var(--text-muted); }
+.post-actions { display: flex; gap: 0.4em; }
+.toolbar {
+	display: flex;
+	gap: 0.6em;
+	margin-bottom: 1.5em;
+	flex-wrap: wrap;
+}
+.editor-panel { }
+.editor-field { margin-bottom: 1em; }
+.editor-field label { margin-bottom: 0.2em; }
+.editor-field input { }
+.editor-field textarea { min-height: 400px; line-height: 1.8; font-size: 0.95em; resize: vertical; font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace; }
+.editor-actions { display: flex; gap: 0.6em; margin-top: 1em; }
+.breadcrumb { font-size: 0.85em; color: var(--text-muted); margin-bottom: 1.2em; cursor: pointer; }
+.breadcrumb:hover { color: var(--green-dark); }
+#saveStatus { font-size: 0.85em; color: var(--text-muted); margin-left: 0.5em; align-self: center; }
+#saveStatus.success { color: #2d7a3e; }
+#saveStatus.error { color: #d1453b; }
+.repo-setup {
+	font-size: 0.85em;
+	margin-top: 1em;
+	padding: 1em;
+	background: rgba(197,205,182,0.2);
+	border-radius: 6px;
+}
+.repo-setup code {
+	font-size: 0.9em;
+	background: rgba(255,255,255,0.5);
+	padding: 0.1em 0.4em;
+	border-radius: 3px;
+	word-break: break-all;
+}
+@media (max-width: 720px) {
+	.container { padding: 1em; }
+}
+</style>
+</head>
+<body>
+<header>
+	<h1>⚙️ 后台管理</h1>
+	<a href="/" target="_blank">← 返回网站</a>
+</header>
+<div class="container" id="app">
+
+<!-- Login -->
+<div id="loginView" class="login-box">
+	<h2>登录</h2>
+	<p>输入你的 GitHub Personal Access Token 来管理博客内容。<br>Token 只会保存在你的浏览器本地，不会上传到其他地方。</p>
+	<div class="input-group">
+		<label for="tokenInput">GitHub Personal Access Token</label>
+		<input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+	</div>
+	<div class="input-group">
+		<label for="repoInput">仓库名 (owner/repo)</label>
+		<input type="text" id="repoInput" placeholder="cooper233345/awm233-yx-blog" />
+		<p style="font-size:0.82em;color:var(--text-muted);margin-top:0.3em;">比如 cooper233345/awm233-yx-blog</p>
+	</div>
+	<button class="btn btn-primary" onclick="login()">登录</button>
+	<div class="repo-setup">
+		<strong>如何创建 Token？</strong><br><br>
+		1. 打开 <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a><br>
+		2. 点击 "Generate new token (classic)"<br>
+		3. 勾选 <code>repo</code> 权限<br>
+		4. 生成后复制粘贴到左边<br><br>
+		或者先用 <strong>demo</strong> 作为 token 和 <strong>demo/demo</strong> 作为仓库名进入界面看看。
+	</div>
+</div>
+
+<!-- Post list -->
+<div id="listView" class="hidden">
+	<div class="toolbar">
+		<button class="btn btn-primary" onclick="newPost()">✏️ 写新文章</button>
+		<button class="btn btn-secondary" onclick="logout()">注销</button>
+		<span id="listStatus" style="font-size:0.85em;color:var(--text-muted);align-self:center;"></span>
+	</div>
+	<ul class="post-list" id="postList"></ul>
+</div>
+
+<!-- Editor -->
+<div id="editorView" class="hidden">
+	<div class="breadcrumb" onclick="backToList()">← 返回文章列表</div>
+	<div class="editor-panel">
+		<div class="editor-field">
+			<label>标题</label>
+			<input type="text" id="editTitle" placeholder="文章标题" />
+		</div>
+		<div class="editor-field">
+			<label>描述（会显示在文章卡片上）</label>
+			<input type="text" id="editDesc" placeholder="简短描述" />
+		</div>
+		<div class="editor-field">
+			<label>日期</label>
+			<input type="text" id="editDate" placeholder="Jun 28 2026" />
+		</div>
+		<div class="editor-field" style="flex:1">
+			<label style="display:flex;justify-content:space-between;">
+				<span>正文 (Markdown)</span>
+				<span id="saveStatus"></span>
+			</label>
+			<textarea id="editBody" placeholder="在这里写内容…"></textarea>
+		</div>
+		<div class="editor-actions">
+			<button class="btn btn-primary" onclick="savePost()">💾 保存</button>
+			<button class="btn btn-danger" id="deleteBtn" onclick="deletePost()">🗑 删除</button>
+		</div>
+	</div>
+</div>
+
+</div>
+<script>
+let state = {
+	token: '',
+	repo: '',
+	files: [],
+	currentFile: null,
+};
+
+// ==== GitHub API ====
+const GH = 'https://api.github.com';
+
+async function ghFetch(url, opts = {}) {
+	if (state.token === 'demo') {
+		return demoResponse(url, opts);
+	}
+	const res = await fetch(GH + url, {
+		...opts,
+		headers: {
+			'Authorization': 'Bearer ' + state.token,
+			'Accept': 'application/vnd.github.v3+json',
+			'Content-Type': 'application/json',
+			...opts.headers,
+		},
+	});
+	if (!res.ok) {
+		const err = await res.json().catch(() => ({ message: res.statusText }));
+		throw new Error(err.message || '请求失败');
+	}
+	return res;
+}
+
+// ==== Demo mode ====
+function demoResponse(url, opts) {
+	if (url.includes('/git/blobs')) {
+		return { json: async () => ({ content: btoa(demoPosts[state.currentFile] || '# 文章内容') }) };
+	}
+	if (url.includes('/contents/')) {
+		if (opts.method === 'PUT') {
+			return { json: async () => ({ content: { sha: 'demo' } }) };
+		}
+		if (opts.method === 'DELETE') {
+			return { json: async () => ({}) };
+		}
+		return { json: async () => demoPostsList() };
+	}
+	if (url.includes('/git/trees')) {
+		return { json: async () => ({ tree: demoPostsList().filter(f => f.type === 'file').map(f => ({ path: f.path, type: 'blob' })) }) };
+	}
+	return { json: async () => ({}) };
+}
+
+const demoPosts = {
+	'first-post.md': null
+};
+
+function demoPostsList() {
+	// Read demo content from current editor state
+	const content = state.currentFile === 'new' ? null : (demoPosts[state.currentFile] || null);
+	return [
+		{ name: 'first-post.md', path: 'src/content/blog/first-post.md', type: 'file', sha: 'demo', demoContent: content || '---\ntitle: 随便写写\ndescription: 第一篇嘛随便写写\npubDate: Jun 27 2026\n---\n\n这是演示内容。你可以正常编辑保存。' },
+	];
+}
+
+// ==== Data ====
+async function listPosts() {
+	state.files = [];
+	const res = await ghFetch('/repos/' + state.repo + '/git/trees/HEAD?recursive=1');
+	const data = await res.json();
+	state.files = data.tree.filter(f => f.path.startsWith('src/content/blog/') && f.path.endsWith('.md'));
+	return state.files;
+}
+
+async function getPostContent(path) {
+	if (state.token === 'demo' && state.currentFile === path) {
+		const content = document.getElementById('editBody')?.value;
+		if (content) return content;
+	}
+	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
+	const data = await res.json();
+	return atob(data.content.replace(/\n/g, ''));
+}
+
+function parseFrontmatter(text) {
+	const m = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+	if (!m) return { frontmatter: { title: '', description: '', pubDate: '' }, body: text };
+	const fm = {};
+	m[1].split('\n').forEach(line => {
+		const [k, ...v] = line.split(':');
+		if (k && v.length) fm[k.trim()] = v.join(':').trim();
+	});
+	return { frontmatter: fm, body: m[2].trim() };
+}
+
+function buildFrontmatter(title, desc, date, body) {
+	return `---\ntitle: ${title}\ndescription: ${desc}\npubDate: ${date}\n---\n\n${body.trim()}\n`;
+}
+
+async function saveFile(path, content, message) {
+	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
+	let sha = null;
+	try {
+		const data = await res.json();
+		sha = data.sha;
+	} catch(e) { /* new file */ }
+
+	const putRes = await ghFetch('/repos/' + state.repo + '/contents/' + path, {
+		method: 'PUT',
+		body: JSON.stringify({
+			message: message || 'Update from CMS',
+			content: btoa(unescape(encodeURIComponent(content))),
+			sha: sha || undefined,
+		}),
+	});
+	return putRes.json();
+}
+
+async function deleteFile(path, message) {
+	const res = await ghFetch('/repos/' + state.repo + '/contents/' + path);
+	const data = await res.json();
+	await ghFetch('/repos/' + state.repo + '/contents/' + path, {
+		method: 'DELETE',
+		body: JSON.stringify({
+			message: message || 'Delete from CMS',
+			sha: data.sha,
+		}),
+	});
+}
+
+// ==== UI ====
+function login() {
+	const token = document.getElementById('tokenInput').value.trim();
+	const repo = document.getElementById('repoInput').value.trim();
+	if (!token || !repo) { alert('请填写 Token 和仓库名'); return; }
+	state.token = token;
+	state.repo = repo;
+	localStorage.setItem('cms_token', token);
+	localStorage.setItem('cms_repo', repo);
+	loadList();
+}
+
+function logout() {
+	state.token = '';
+	state.repo = '';
+	localStorage.removeItem('cms_token');
+	localStorage.removeItem('cms_repo');
+	showView('login');
+}
+
+function showView(view) {
+	document.getElementById('loginView').classList.toggle('hidden', view !== 'login');
+	document.getElementById('listView').classList.toggle('hidden', view !== 'list');
+	document.getElementById('editorView').classList.toggle('hidden', view !== 'editor');
+}
+
+function backToList() { showView('list'); loadList(); }
+
+async function loadList() {
+	showView('list');
+	document.getElementById('listStatus').textContent = '加载中...';
+	try {
+		const files = await listPosts();
+		const ul = document.getElementById('postList');
+		ul.innerHTML = '';
+		const postInfos = [];
+		for (const f of files) {
+			const content = await getPostContent(f.path);
+			const { frontmatter } = parseFrontmatter(content);
+			postInfos.push({ ...f, title: frontmatter.title || f.name, date: frontmatter.pubDate || '' });
+		}
+		postInfos.sort((a, b) => b.date.localeCompare(a.date));
+		postInfos.forEach(p => {
+			const li = document.createElement('li');
+			li.className = 'post-item';
+			li.innerHTML = `<div class="info"><h3>${esc(p.title)}</h3><div class="meta">${esc(p.date)} · ${esc(p.path)}</div></div>
+				<div class="post-actions">
+					<button class="btn btn-secondary btn-small" onclick="editPost('${esc(p.path)}')">编辑</button>
+					<button class="btn btn-danger btn-small" onclick="confirmDelete('${esc(p.path)}')">删除</button>
+				</div>`;
+			ul.appendChild(li);
+		});
+		document.getElementById('listStatus').textContent = '';
+	} catch(e) {
+		document.getElementById('listStatus').textContent = '加载失败: ' + e.message;
+	}
+}
+
+function newPost() {
+	state.currentFile = 'new';
+	document.getElementById('editTitle').value = '';
+	document.getElementById('editDesc').value = '';
+	document.getElementById('editDate').value = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+	document.getElementById('editBody').value = '';
+	document.getElementById('saveStatus').textContent = '';
+	document.getElementById('deleteBtn').classList.add('hidden');
+	showView('editor');
+}
+
+async function editPost(path) {
+	state.currentFile = path;
+	document.getElementById('deleteBtn').classList.remove('hidden');
+	try {
+		const content = await getPostContent(path);
+		const { frontmatter, body } = parseFrontmatter(content);
+		document.getElementById('editTitle').value = frontmatter.title || '';
+		document.getElementById('editDesc').value = frontmatter.description || '';
+		document.getElementById('editDate').value = frontmatter.pubDate || '';
+		document.getElementById('editBody').value = body || content;
+		document.getElementById('saveStatus').textContent = '';
+		showView('editor');
+	} catch(e) {
+		alert('加载失败: ' + e.message);
+	}
+}
+
+async function savePost() {
+	const title = document.getElementById('editTitle').value.trim();
+	const desc = document.getElementById('editDesc').value.trim();
+	const date = document.getElementById('editDate').value.trim();
+	const body = document.getElementById('editBody').value.trim();
+	if (!title || !date || !body) { alert('请填写标题、日期和正文'); return; }
+
+	const st = document.getElementById('saveStatus');
+	st.textContent = '保存中...';
+	st.className = '';
+	try {
+		const content = buildFrontmatter(title, desc, date, body);
+		const filename = state.currentFile === 'new'
+			? 'src/content/blog/' + title.toLowerCase().replace(/[^a-z0-9一-龥]+/g, '-').replace(/(^-|-$)/g, '') + '.md'
+			: state.currentFile;
+		await saveFile(filename, content, 'Update: ' + title);
+		state.currentFile = filename;
+		st.textContent = '✅ 已保存！Vercel 将自动部署。';
+		st.className = 'success';
+	} catch(e) {
+		st.textContent = '❌ 保存失败: ' + e.message;
+		st.className = 'error';
+	}
+}
+
+function confirmDelete(path) {
+	if (!confirm('确定要删除这篇文章吗？')) return;
+	deleteFile(path, 'Delete: ' + path);
+	loadList();
+}
+
+function deletePost() {
+	if (!state.currentFile || state.currentFile === 'new') return;
+	confirmDelete(state.currentFile);
+}
+
+function esc(s) {
+	const d = document.createElement('div');
+	d.textContent = s;
+	return d.innerHTML;
+}
+
+// Auto login
+document.addEventListener('DOMContentLoaded', () => {
+	const t = localStorage.getItem('cms_token');
+	const r = localStorage.getItem('cms_repo');
+	if (t && r) {
+		document.getElementById('tokenInput').value = t;
+		document.getElementById('repoInput').value = r;
+		state.token = t;
+		state.repo = r;
+		loadList();
+	}
+});
+</script>
+</body>
+</html>

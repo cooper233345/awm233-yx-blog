@@ -6,6 +6,8 @@ const today = new Date();
 	<div class="inner">
 		<p class="tagline">碎碎念收纳盒</p>
 		<div class="links">
+			<a href="/admin/index.html" target="_blank">管理</a>
+			<span class="sep">·</span>
 			<a href="https://github.com/cooper233345" target="_blank">GitHub</a>
 		</div>
 		<p class="copyright">&copy; {today.getFullYear()} awm233_YX</p>
@@ -35,6 +37,10 @@ const today = new Date();
 	}
 	.links a:hover {
 		text-decoration: underline;
+	}
+	.sep {
+		color: var(--green-sage);
+		margin: 0 0.4em;
 	}
 	.copyright {
 		color: var(--text-light);

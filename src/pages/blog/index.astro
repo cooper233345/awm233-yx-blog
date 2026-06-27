@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`Blog — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.page-title {
+				margin-bottom: 2em;
+			}
+			.post-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			.post-list li {
+				margin-bottom: 1em;
+			}
+			.post-card {
+				display: block;
+				background: rgba(255, 255, 255, 0.45);
+				backdrop-filter: blur(4px);
+				-webkit-backdrop-filter: blur(4px);
+				padding: 1.3em 1.5em;
+				border-radius: 10px;
+				text-decoration: none;
+				border: 1px solid rgba(197, 205, 182, 0.3);
+				transition: background 0.25s, transform 0.2s, border-color 0.25s;
+			}
+			.post-card:hover {
+				background: rgba(255, 255, 255, 0.7);
+				transform: translateY(-2px);
+				border-color: var(--green-sage);
+			}
+			.post-card h3 {
+				margin: 0.2em 0 0.3em;
+				font-size: 1.25em;
+				font-weight: 600;
+				color: var(--green-dark);
+			}
+			.post-card:hover h3 {
+				color: var(--green-deeper);
+			}
+			.post-card .date {
+				font-size: 0.82em;
+				color: var(--text-light);
+			}
+			.post-card p {
+				margin: 0;
+				color: var(--text-muted);
+				font-size: 0.92em;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="page-title">
+				<h1>Blog</h1>
+			</div>
+			<ul class="post-list">
+				{
+					posts.map((post) => (
+						<li>
+							<a class="post-card" href={`/blog/${post.id}/`}>
+								<div class="date"><FormattedDate date={post.data.pubDate} /></div>
+								<h3>{post.data.title}</h3>
+								{post.data.description && <p>{post.data.description}</p>}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>

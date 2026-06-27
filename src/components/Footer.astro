@@ -1,0 +1,42 @@
+---
+const today = new Date();
+---
+
+<footer>
+	<div class="inner">
+		<p class="tagline">碎碎念收纳盒</p>
+		<div class="links">
+			<a href="https://github.com/cooper233345" target="_blank">GitHub</a>
+		</div>
+		<p class="copyright">&copy; {today.getFullYear()} awm233_YX</p>
+	</div>
+</footer>
+<style>
+	footer {
+		text-align: center;
+		padding: 3em 1.5em 3.5em;
+		color: var(--text-light);
+		font-size: 0.85em;
+		border-top: 1px solid var(--green-sage-light);
+		margin-top: 3em;
+	}
+	.tagline {
+		font-style: italic;
+		margin-bottom: 0.8em;
+		color: var(--text-muted);
+	}
+	.links {
+		margin-bottom: 1em;
+	}
+	.links a {
+		color: var(--green-dark);
+		text-decoration: none;
+		font-weight: 500;
+	}
+	.links a:hover {
+		text-decoration: underline;
+	}
+	.copyright {
+		color: var(--text-light);
+	}
+</style>

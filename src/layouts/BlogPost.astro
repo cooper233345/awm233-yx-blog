@@ -1,0 +1,74 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate } = Astro.props;
+---
+
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			article {
+				background: rgba(255, 255, 255, 0.45);
+				backdrop-filter: blur(4px);
+				-webkit-backdrop-filter: blur(4px);
+				padding: 2.5em;
+				border-radius: 12px;
+				border: 1px solid rgba(197, 205, 182, 0.3);
+			}
+			.post-header {
+				margin-bottom: 2em;
+				text-align: center;
+			}
+			.post-header h1 {
+				margin: 0.3em 0;
+				font-size: 2em;
+			}
+			.date {
+				color: var(--text-light);
+				font-size: 0.85em;
+			}
+			.content {
+				font-size: 1em;
+				line-height: 1.9;
+			}
+			.content p:first-child {
+				font-size: 1.08em;
+			}
+			@media (max-width: 720px) {
+				article {
+					padding: 1.5em;
+				}
+				.post-header h1 {
+					font-size: 1.5em;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="post-header">
+					<div class="date">
+						<FormattedDate date={pubDate} />
+						{updatedDate && <span> · 更新于 <FormattedDate date={updatedDate} /></span>}
+					</div>
+					<h1>{title}</h1>
+					<hr />
+				</div>
+				<div class="content">
+					<slot />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

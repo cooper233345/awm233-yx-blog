@@ -1,0 +1,118 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const recentPosts = posts.slice(0, 3);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero">
+				<img src="/logo.png" alt="" class="hero-logo" width="120" height="120" />
+				<h1>awm233_YX</h1>
+				<p class="subtitle">碎碎念 · 收纳盒</p>
+			</section>
+
+			{recentPosts.length > 0 && (
+				<section class="recent">
+					<h2>最近</h2>
+					<ul class="post-list">
+						{recentPosts.map((post) => (
+							<li>
+								<a class="post-card" href={`/blog/${post.id}/`}>
+									<div class="date"><FormattedDate date={post.data.pubDate} /></div>
+									<h3>{post.data.title}</h3>
+									{post.data.description && <p>{post.data.description}</p>}
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+<style>
+	.hero {
+		text-align: center;
+		padding: 1.5em 0 2.5em;
+	}
+	.hero-logo {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		margin-bottom: 1em;
+		box-shadow: 0 4px 20px rgba(45, 74, 62, 0.1);
+	}
+	.hero h1 {
+		font-size: 2.6em;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.2em;
+	}
+	.subtitle {
+		font-size: 1.1em;
+		color: var(--text-muted);
+		letter-spacing: 0.15em;
+	}
+
+	.recent h2 {
+		margin-top: 0;
+	}
+	.post-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.post-list li {
+		margin-bottom: 1em;
+	}
+	.post-card {
+		display: block;
+		background: rgba(255, 255, 255, 0.45);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		padding: 1.2em 1.5em;
+		border-radius: 10px;
+		text-decoration: none;
+		border: 1px solid rgba(197, 205, 182, 0.3);
+		transition: background 0.25s, transform 0.2s, border-color 0.25s;
+	}
+	.post-card:hover {
+		background: rgba(255, 255, 255, 0.7);
+		transform: translateY(-2px);
+		border-color: var(--green-sage);
+	}
+	.post-card h3 {
+		margin: 0.2em 0 0.3em;
+		font-size: 1.2em;
+		font-weight: 600;
+		color: var(--green-dark);
+	}
+	.post-card:hover h3 {
+		color: var(--green-deeper);
+	}
+	.post-card .date {
+		font-size: 0.82em;
+		color: var(--text-light);
+	}
+	.post-card p {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 0.9em;
+	}
+</style>

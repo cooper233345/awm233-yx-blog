@@ -1,0 +1,53 @@
+---
+import HeaderLink from './HeaderLink.astro';
+---
+
+<header>
+	<nav>
+		<a href="/" class="logo-link">
+			<img src="/logo.png" alt="awm233_YX" class="logo" width="40" height="40" />
+		</a>
+		<div class="nav-links">
+			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+	</nav>
+</header>
+<style>
+	header {
+		padding: 0.8em 1.5em;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		background: rgba(245, 240, 232, 0.7);
+		border-bottom: 1px solid var(--green-sage-light);
+		position: sticky;
+		top: 0;
+		z-index: 10;
+	}
+	nav {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.logo-link {
+		line-height: 0;
+		text-decoration: none;
+	}
+	.logo {
+		border-radius: 50%;
+		width: 36px;
+		height: 36px;
+		object-fit: cover;
+		transition: transform 0.2s;
+	}
+	.logo:hover {
+		transform: scale(1.08);
+	}
+	.nav-links {
+		display: flex;
+		gap: 0.3em;
+	}
+</style>
